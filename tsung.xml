@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<!DOCTYPE tsung SYSTEM "/usr/share/tsung/tsung-1.0.dtd">
+<tsung loglevel="notice" version="1.0">
+
+<!-- <client> 只是简单地指定了运行 Tsung 的主机。你可以指定 Tsung 使用的 IP 和 CPU 的最大数。你可以使用 maxusers 设置节点能够模拟的用户数量上限。每一个用户都会执行我们之后定义的操作。--> 
+<clients>
+<client host="localhost" weight="1" cpu="4" maxusers="40000"></client>
+</clients>
+
+<!--<servers> 指定了你要测试的 HTTP 服务器。我们可以使用这个选项去测试一个 IP 集群，或者一个单一的服务器。 --> 
+<servers>
+<server host=" 122.226.100.69" port="80" type="tcp"/>
+</servers>
+
+<!--<load> 定义了我们的模拟用户将会在什么时候“到达”我们的网站。以及它们达到的有多快。 --> 
+<load>
+<arrivalphase phase="1" duration="10" unit="minute">
+<users maxnumber="15000" arrivalrate="8" unit="second"/>
+</arrivalphase>
+ 
+<arrivalphase phase="2" duration="10" unit="minute">
+<users maxnumber="15000" arrivalrate="8" unit="second"/>
+</arrivalphase>
+ 
+<arrivalphase phase="3" duration="30" unit="minute">
+<users maxnumber="20000" arrivalrate="3" unit="second"/>
+</arrivalphase>
+ 
+</load>
+
+<!--<session> 这部分定义了一旦这些用户达到了你的网站，它们将会执行什么动作。--> 
+<sessions>
+<session probability="100" name="ab" type="ts_http">
+<for from="1" to="10000000" var="i">
+<request> <http url="/tag/java/" method="GET" version="1.1"/> </request>
+</for>
+</session>
+</sessions>
+</tsung>
+
