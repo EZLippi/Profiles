@@ -1,0 +1,13 @@
+1. ctrl+shift+r：打开资源
+2. ctrl+o：快速outline
+3. ctrl+e：快速转换编辑器
+4. alt+shift+r：重命名
+5. alt+shift+l以及alt+shift+m：提取本地变量及方法
+6. Alt+方向键 将当前内容上移或下移
+7. ctrl+m 编辑器窗口最大化
+8.  F3: 打开申明
+9.  Alt-left arrow: 在导航历史记录（Navigation History）中后退。
+10. Control-Q: 回到最后一次编辑的地方
+11. Ctrl+T 查看一个类的继承关系树
+12. Ctrl+Alt+↓ 复制当前行到下一行(复制增加)
+13. ctrl+alt+h ，会把所有使用了该方法或变量的地方找出来
