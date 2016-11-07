@@ -1,0 +1,225 @@
+Mockito 是一个针对 Java 的单元测试模拟框架，它与 EasyMock 和 jMock 很相似，都是为了简化单元测试过程中测试上下文的搭建而开发的工具。
+
+PowerMock 也是一个单元测试模拟框架，它是在其它单元测试模拟框架的基础上做出的扩展。通过提供定制的类加载器以及一些字节码篡改技巧的应用，PowerMock 现了对静态方法、构造方法、私有方法以及 Final 方法的模拟支持，对静态初始化过程的移除等强大的功能。
+使用实例
+ 
+对于使用PowerMock的测试类，需要添加注解:
+ @RunWith(PowerMockRunner.class)
+模拟方法返回
+首先对被测接口(类)进行mock，然后录制相关行为，假设你要测试的类为InterfaceToMock,
+
+ //通过PowerMock创建一个虚拟对象 
+ InterfaceToMock mock = Powermockito.mock(InterfaceToMock.class)
+ //value为你想要让这个method返回的值
+  Powermockito.when(mock.method(Params…)).thenReturn(valueToReturn)
+ //如果这个方法返回值为空，则上面的写法会报错,可采用下面的写法
+  Powermockito.when(mock, "methodName", Object... params).thenReturn(valueToReturn)  
+  // 也可以采用下面的写法，和上面的一样的效果
+  Powermockito.doReturn(valueToReturn).when(mock, "methodName", Object... params) 
+  //这样写也行，适合返回值为void的方法
+   Powermockito.doReturn(valueToReturn).when(mock).methodName(Object... params)   
+  //你也可以让方法抛异常
+  Powermockito.when(mock.method(Params..)).thenThrow(new OMSException("oms"))
+  //你可以让方法每一次返回的结果都不一样,下面的例子第一次正常返回，第二次调用抛异常
+  Powermockito.when(mock.method(Params..)).thenReturn(valueToReturn).thenThrow(new OMSException("some Exception"))
+  //如果方法返回值为void,不能用thenReturn,要用doThing()
+  Powermockito.doNothing().when(mock.method(Params...))  
+  
+  WhiteBox设置对象的属性、Invoke私有方法
+
+ //可以设置private、static、final域的值,不需要添加到@PrepareForTest注解中
+ //设置对象的实例域 
+ Whitebox.setInternalState(Object object, String fieldname, Object… value);
+ //设置类的静态属性 
+ Whitebox.setInternalState(Class  clazz, String fieldname, Object… value); 
+ //查看对象的属性
+  Whitebox.getInternalState（Object obj, String fieldName）
+ //Invoke对象方法(包括private方法)
+ WhiteBox.invokeMethod(Object obj, Object ... params)
+ //invoke静态方法（包括私有静态方法）
+ WhiteBox.invokeMethod(Class clazz, Object ... params)     
+其中object为需要设置属性的对象，Class为需要为静态域设置属性的类。
+
+模拟构造函数
+模拟构造函数、私有方法、static方法、final方法都需要在测试类上添加注解PrepareForTest({被Mock的类})
+ @PrepareForTest({ InstanceClass.class })
+ //同时也需要把调用这个构造方法的那个类加到注解里去
+ @PrepareForTest({ InstanceClass.class,ClassA.class })
+ 
+ 对于模拟构造函数，也即当出现new InstanceClass()时可以将此构造函数拦截并替换结果为我们需要的mock对象。
+
+注意：使用时需要加入标记：
+
+ @RunWith(PowerMockRunner.class)
+ @PrepareForTest({ InstanceClass.class,A.class })
+ public class TestConstructorMock{
+  @Test  
+  public testMock(){     
+     InstanceClass instanceToReturn = PowerMockito.mock(InstanceClass.class);
+     //do something with instanceToReturn  
+    Powermockito.whenNew(InstanceClass.class).withArguments(Params...).
+        thenReturn(instanceToReturn);
+    //或者匹配任何参数
+    Powermockito.whenNew(InstanceClass.class).withAnyArguments().
+         thenReturn(instanceToReturn);  
+    //如果没有参数
+      Powermockito.whenNew(InstanceClass.class).withNoArguments().
+         thenReturn(instanceToReturn);  
+     }
+ }
+ 
+ 举个实际点的例子,下面的ClassA的myMethod方法会调用MyQueryClass的构造器，并调用getNextId方法，由于这个方法是在myMethod内部调用的，无法直接Mock，这时候需要Mock MyQueryClass的构造器，返回一个Mock的MyQueryClass并修改getNextId的默认行为：
+Class A {
+  public boolean myMethod(someargs) {
+    MyQueryClass query = new MyQueryClass();
+    Long id = query.getNextId();
+    // some more code
+  }
+}
+Class MyQueryClass     {
+  ....
+  public Long getNextId() {
+    //lot of DB code, execute some DB query
+    return id;
+  }
+}   
+
+//测试用例
+@RunWith(PowerMockRunner.class)
+@PrepareForTest({MyQueryClass.class，A.class})  
+MyQueryClass query = PowerMockito.mock(MyQueryClass.class);
+PowerMockito.whenNew(MyQueryClass.class).withNoArguments().thenReturn(query);
+when(query.getNextId()).thenReturn(1000000L);
+
+boolean b = A.getInstance().myMethod(args);
+模拟静态方法
+模拟静态方法类似于模拟构造函数，也需要加入注释标记。
+
+ @RunWith(PowerMockRunner.class)
+ @PrepareForTest({ StaticClassToMock.class })
+ public class TestConstructorMock{
+     @Test
+     public testMock(){  
+     //模拟静态方法前需要调用这一句 
+     Powermockito.mockStatic(StaticClassToMock.class);
+     Powermockito.when(StaticClassToMock.method(Object.. params)).thenReturn(Object value)
+    }
+}
+模拟final方法
+Final方法的模拟类似于模拟静态方法。
+
+ @RunWith(PowerMockRunner.class)
+ @PrepareForTest({ FinalClassToMock.class })
+ public class TestConstructorMock{
+     @Test
+   public testMock(){ 
+     FinalClassToMock mock = Powermockito.mock(FinalClassToMock.class);
+     Powermockito.when(mock.method(Object.. params)).thenReturn(Object value)
+     }
+}
+使用spy方法避免执行某个类中的成员函数
+如被测试类为：TargetClass，想要屏蔽的方法为targetMethod.
+
+1）  PowerMockito.spy(TargetClass.class);
+
+2）  Powemockito.when(TargetClass.targetMethod()).doReturn()
+
+3）  注意加入
+
+@RunWith(PowerMockRunner.class)
+
+@PrepareForTest(TargetClass.class)
+
+参数匹配器
+有时我们在处理doMethod(Param param)时，不想进行精确匹配，这时可以使用Mockito提供的模糊匹配方式。
+
+如：
+
+Mockito.anyInt()，Mockito.anyString()，Mockito.any()
+
+举例说明：pmProbeCenter的getCollectInfo()方法有三个String类型的参数，如果你想匹配所有的参数，可以这样写：
+
+(如果能够精确匹配某个参数那就采用精确匹配)
+
+ PowerMockito.when(pmProbeCenter.getCollectInfo(Mockito.anyString(), Mockito.anyString(), Mockito.anyString())).thenReturn(measUnitProp);
+ 
+ 验证方法是否被执行
+  对于Mock出来的对象，你可以验证用例执行过程中该对象(类)的实例方法(静态方法)是否被调用，可以采用下面的写法：
+
+ //验证实例方法调用
+ PowerMockito.verify(object.method());
+//验证静态方法被调用了一次 
+PowerMockito.verifyStatic( Mockito.times(1)); 
+InstanceClass.method(); 
+
+Mockito进阶
+ 
+1. spy()和mock()
+
+Mock的原理是创建了一个新的类，这个类包含了所有被测类的接口，但是里面不包含任何代码，只有返回值，而spy的作用是让被测类正常工作，但是可以拦截某些方法的返回值，比如有这样一个类：
+
+ class Subject {
+        public int doStuff(){
+            System.out.println("doStuff called");
+            return 42;
+        }
+    }
+我想让doStuff方法的逻辑执行一遍，但是返回一个我期望的值(比如1)，那就可以用spy()，做法如下：
+@Test
+public void testSpy(){
+    final Subject mock = PowerMockito.spy(new Subject());
+    PowerMockito.when(mock.doStuff()).thenReturn(1);
+    Assert.assertEquals(1, mock.doStuff()); 
+}
+doStuff方法执行之后日志打印出来，返回值为1，运行结果如下：
+
+doStuff called
+Process finished with exit code 0 
+2. 禁用非预期行为
+
+考虑如下的场景，调用子类构造器时会调用父类的构造器，但是父类的数据无法构造导致抛异常，这时候可以禁用父类的构造器来避免抛异常，举例说明：
+public class BaseEntity { 
+    public BaseEntity() {
+        throw new UnsupportedOperationException();
+    }  
+    protected void performAudit(String auditInformation) {
+        throw new UnsupportedOperationException();
+    }
+}
+
+public class Department extends BaseEntity {
+
+    private int departmentId;
+    
+    public Department(int departmentId) {
+        super();
+        this.departmentId = departmentId;
+    }  
+    
+    protected void performAudit(String auditInformation) {
+        super.performAudit(auditInformation);
+        //doSomething()
+
+    }
+    
+    public Object getDepartmentId() {
+        return departmentId;
+    }
+    
+
+}
+正常情况下new Department时会报UnsupportOperationException(),这时候可以用Mockito提供的功能来禁用父类构造器的调用，需要在被测类在添加注解SuppressStaticInitializationFor("BaseEntity"),然后使用PowerMockito的suppress方法来禁止构造器或者方法的调用，如下所示：
+
+ @RunWith(PowerMockRunner.class)
+@PrepareForTest({Department.class})
+@SuppressStaticInitializationFor("i2000.llt.med.test.BaseEntity")
+public class TestSupress {
+    @Test
+    public void test(){
+        PowerMockito.suppress(PowerMockito.constructor(BaseEntity.class));
+        Assert.assertEquals(10, new Department(10).getDepartmentId());
+        PowerMockito.suppress(PowerMockito.method(BaseEntity.class, "performAudit", String.class));
+        Department department = new Department(19);
+        department.performAudit("audit");
+    }
+}
