@@ -1,0 +1,31 @@
+1.	存储对象类型，
+public void insertUser(User user){
+ Map<String, String> userProperties = new HashMap<String, String>();
+ userProperties.put("username", user.getUsername());
+ userProperties.put("firstName", user.getFirstName());
+ userProperties.put("lastName", user.getLastName());
+ userProperties.put("email", user.getEmail());
+ userProperties.put("password", user.getPassword());
+ 
+ jedis.hmset("user:" + user.getUsername(), userProperties);
+ }
+可以考虑编写工具方法将对象转换成HashMap
+2.	更新对象的某个属性
+public void updateEmail(User user){
+    jedis.hset("user:" + user.getUsername(), "email", user.getEmail());
+}
+3.	有序集合，集合中每个元素有个对应的score,根据这个score来排序
+//Adding a value with score to the set
+ jedis.zadd(key,100,"Java");//ZADD
+ 
+ //We could add more than one value in one calling
+ Map<Double, String> scoreMembers = new HashMap<Double, String>();
+ scoreMembers.put(90d, "Python");
+ scoreMembers.put(80d, "Javascript");
+ jedis.zadd(key, scoreMembers);
+4.	Pub/Sub模式，可以用在事件分发中，其他模块可以订阅网元变更事件，对于网元的增删改事件，可以继承JedisPubSub类，然后重写onMessage方法，由于Jedis的subscribe操作是阻塞的，需要另起一个线程来进行subscribe操作:
+jedis = jedisPool.getResource();
+jedis.subscribe(subscriber, channel);
+jedis.publish("mychannel", “someString”);
+需要将对象类型序列化成字符串。
+5.	
