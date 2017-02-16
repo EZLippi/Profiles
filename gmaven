@@ -1,0 +1,196 @@
+                   <plugin>
+                        <groupId>org.codehaus.gmaven</groupId>
+                        <artifactId>gmaven-plugin</artifactId>
+                        <version>1.5</version>
+                        <executions>
+                            <execution>
+                                <id>make new jar</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>execute</goal>
+                                </goals>
+                                <configuration>
+                                    <source>
+                                        private String getWebContextFromManifest(File warFile) {
+                                            String context = null;
+                                            java.util.jar.JarFile jarFile = null;
+                                            try {
+                                                jarFile = new java.util.jar.JarFile(warFile);
+                                                context =
+                                                    jarFile.getManifest().getMainAttributes().getValue("WebContext-Name");
+                                                context = context == null ? "ROOT" : context;
+                                                context = context.replace("\", "/");
+                                                context = context.replaceAll("[/]{2,}", "/");
+                                                context = context.endsWith("/") ? context.substring(0, context.length() - 1) : context;
+                                                context = context.startsWith("/") ? context.substring(1, context.length()) : context;
+                                                context = context.replaceAll("/", "#");
+                                                return context;
+                                            } catch (Exception e) {
+                                                System.out.println("-------------------context eror: ",e);
+                                                context = "ROOT";
+                                            } finally {
+                                                if (jarFile != null) {
+                                                    jarFile.close();
+                                                }
+                                            }
+                                            System.out.println("-------------------context is: " + context);
+                                            return context;
+                                        }
+
+                                        System.out.println("------------------------------1")
+                                        List contexts=new ArrayList();
+                                        deploydependencisdir = "${project.build.directory}/deploydependencis";
+                                        unzipdir = "${project.build.directory}/deployunzip";
+                                        outputdir = "${project.build.directory}/deployoutput";
+                                        resourcesdir = "${project.basedir}/src/main/release";
+                                        jarsdir = "${unzipdir}/lib";
+                                        toolpath = "${project.build.directory}/deployoutputjars";
+                                        
+                                        System.out.println("------------------------------2")
+                                        ant = new AntBuilder()
+                                        ant.delete(dir: "${unzipdir}")
+                                        ant.mkdir(dir: "${unzipdir}")
+                                        ant.mkdir(dir: toolpath)
+                                        ant.delete(dir: "${outputdir}")
+                                        ant.mkdir(dir: "${outputdir}")
+                                        ant.delete(dir: "${jarsdir}")
+                                        ant.mkdir(dir: "${jarsdir}")
+                                        outputFileName = "${project.name}"
+
+                                        System.out.println("------------------------------3")
+                                        if(new File("${deploydependencisdir}").exists()){
+                                            for (File file : new File("${deploydependencisdir}").listFiles())
+                                            {
+                                                String filePath = file.getAbsolutePath();
+                                                fileName = file.getName();
+                                                if (fileName.endsWith(".war")) {
+                                                    context = getWebContextFromManifest(file)
+                                                    ant.mkdir(dir: "${unzipdir}/webapps/" + context)
+                                                    ant.unzip(src: filePath, dest: "${unzipdir}/webapps/" + context)
+                                                    ant.copy(todir: toolpath) {
+                                                        fileset(dir: "${unzipdir}/webapps/" + context + "/WEB-INF/lib") {
+                                                            include(name: "*.jar")
+                                                        }
+                                                    }
+
+                                                }
+                                            }
+                                          
+                                            contexts.add(toolpath)
+                                            ant.copy(todir: toolpath) {
+                                                fileset(dir: "${deploydependencisdir}") {
+                                                    include(name: "*.jar")
+                                                }
+                                            }
+                                        }
+                                        
+                                        
+                                        System.out.println("------------------------------4")
+                                        ant.copy(todir: toolpath) {
+                                            fileset(dir: "${project.build.directory}") {
+                                                include(name: "*.jar")
+                                            }
+                                        }
+                                        
+                                        ant.copy(todir: "${unzipdir}") {
+                                            fileset(dir: "${resourcesdir}") {
+                                                include(name: "**")
+                                            }
+                                        }
+                                        
+                                        
+                                        /* compile python .py files. */
+                                        System.out.println("------------------------------5------------------")
+                                        pythonFile = "${project.basedir}/src/main/python";
+                                        if(new File(pythonFile).exists()) {
+                                            try {
+                                                ant.exec(dir: "${project.basedir}/src/main/python", executable: "python") {
+                                                    arg(value: "-m")
+                                                    arg(value: "compileall")
+                                                    arg(value: ".")
+                                                }
+
+                                                ant.copy(todir: "${unzipdir}") {
+                                                    fileset(dir: "${project.basedir}/src/main/python") {
+                                                        include(name: "**/*.*")
+                                                        exclude(name: "**/*.py")
+                                                    }
+                                                }
+                                            } catch (Exception eee) {
+                                                System.out.println("----------------&gt;&gt;&gt;"+eee.toString())
+                                            }
+                                        }
+
+                                        /* copy all dependencies to $APP_ROOT/lib. */
+                                        System.out.println("------------------------------6------------------")
+                                        for(String temPath : contexts)
+                                        {
+                                            if(new File(temPath).exists())
+                                            {
+                                                try {
+                                                    for (File file : new File(temPath).listFiles()) {
+                                                        fileName = file.getName();
+                                                        if (fileName.endsWith(".jar")) {
+                                                            ant.copy(file: file.getAbsolutePath(), todir: "${jarsdir}")
+                                                        }
+                                                    }
+                                                } catch (Exception e) {
+                                                    e.printStackTrace()
+                                                }
+                                            }
+                                        }
+
+                                        /* deploy the upzip file to ${outputdir}/${outputFileName} */
+                                        System.out.println("------------------------------7------------------")
+                                        outputFileName =
+                                            outputFileName.endsWith("Deployment")?outputFileName:outputFileName+"Deployment";
+                                        outputFileName = outputFileName.substring(0, outputFileName.length() - "Deployment".length());
+                                        outputFileName = outputFileName + "-${project.version}.zip";
+
+                                        outputFileName = outputFileName.replace("-SNAPSHOT", 
+                                            "." + new java.text.SimpleDateFormat("yyyyMMddHHmmss").format(
+                                                new Date()));
+
+                                        ant.delete(dir: "${unzipdir}/webapps/ROOT/WEB-INF/lib");
+                                        ant.mkdir(dir: "${unzipdir}/webapps/ROOT/WEB-INF/lib");
+                                        ant.copy(todir: "${unzipdir}/webapps/ROOT/WEB-INF/lib") {
+                                                fileset(dir: "${unzipdir}/lib") {
+                                                    include(name: "ezlippi.db-*.jar")
+                                                }
+                                            }
+                                        
+                                        ant.delete() {
+                                                fileset(dir: "${unzipdir}/lib") {
+                                                    include(name: "ezlippi.db-*.jar")
+                                                }
+                                        }
+										
+                                        /* generate dependencies.list in $APP_ROOT/lib. Requirement for install disk size. */
+                                        System.out.println("------------------------------8------------------")
+                                        dependenciesPath="${unzipdir}/lib";
+                                        try {
+                                            def writer = new File(dependenciesPath+"/dependencies.list").newWriter('UTF-8')
+                                            for (String fileName : new File(dependenciesPath).list()) {
+                                                if (fileName.endsWith(".jar")) {
+                                                    writer.writeLine(fileName);
+                                                }
+                                            }
+                                            writer.close()
+                                        } catch (Exception e) {
+                                            e.printStackTrace()
+                                        }        
+                                        
+										/* make the archive. */
+                                        System.out.println("------------------------------9------------------")
+                                        ant.zip(destfile: "${outputdir}/${outputFileName}") {
+                                            fileset(dir: "${unzipdir}") {
+                                                exclude(name: "**/.gitignore")
+                                            }
+                                        }
+
+                                        System.out.println("------------------------------done")
+                                    </source>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
