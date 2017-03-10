@@ -1,0 +1,15 @@
+1. 编译器类型: -client/-server	分层编译-XX:+TieredCompilation,启动时用C1编译，启动后用C2编译热点代码,用C1或者分层编译容易导致CodeCache内存不够
+
+2. 调整CodeCache大小:-XX:ReservedCodeCacheSize=
+
+3. JVM检查方法调用次数以及循环调用次数来决定是否启动即时编译
+
+4. 设置触发编译的阈值:-XX:CompileThreshold=N
+
+5. 打印编译详情: -XX:+PrintCompilation(默认为false)
+
+6. 设置编译编程的数量:-XX:CICompilerCount=N(如果是分层编译,1/3用于C1编译)
+
+7. 对于比较小的方法编译器会采用内联来减少调用开销，-XX:+InLine(默认开启)
+
+8. 开启逃逸分析-XX:+DoEscapeAnlysis，默认为true,比较复杂
