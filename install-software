@@ -1,17 +1,14 @@
-1. 打IT热线60160配置outlook、notes、打印机
-
-2. 申请proxy权限，http://w3.huawei.com/eso/hidm/basicApp/basicOffice.do?method=basicOffice&catalogId=10137，
-	提交电子流后，在浏览器代理设置：host：proxy.huawei.com Port:8080
-
-3. 通过iDesk安装rtools,公司内部软件库
-
 4. 必备软件：
 	1) JDK(32或64位)，配置好环境变量JAVA_HOME,CLASSPATH和PATH
 	2) Eclipse
 	3) Maven
 	4) Xshell(包括Xshell和Xftp)
 	5) SVN客户端 TortoiseSVN
-	6) Aqua Data Studio6.5+
+	6) Navicat数据库客户端
+	7)EveryThing
+	8)Clover
+	9)Cmder+Chocolatey
+	10)Listary
 
 5. 可选软件
 	1) Everything,文件快速搜索工作
@@ -27,49 +24,6 @@
 	1) 设置等宽字体
 	2) 安装m2eclipse插件，设置maven的安装路径、配置文件路径和本地仓库
 	3) 在maven配置文件中设置本地仓库、私服、代理(可选)，如下所示：
-	 <localRepository>C:\software\maven\repo_C20</localRepository>
-	 <proxies>
-	   <proxy>
-		  <id>huawei-proxy</id>
-		  <active>true</active>
-		  <protocol>http</protocol>
-		  <host>proxy.huawei.com</host>
-		  <port>8080</port>
-		  <nonProxyHosts>10.*|192.168.*|*.huawei.com|127.0.0.1</nonProxyHosts>
-		</proxy>
-	</proxies>
-	<repositories>
-        <repository>
-            <id>central</id>
-            <name>local private nexus</name>
-            <url>http://10.64.175.225:8081/nexus/content/groups/I2000V5MainRelease</url>
-            <releases><enabled>true</enabled></releases>
-            <snapshots><enabled>false</enabled></snapshots>
-        </repository>
-        <repository>
-            <id>central-snapshots</id>
-            <name>local private nexus</name>
-            <url>http://10.64.175.225:8081/nexus/content/groups/I2000V5MainSnapshot</url>
-            <releases><enabled>false</enabled></releases>
-            <snapshots><enabled>true</enabled></snapshots>
-        </repository>
-	</repositories>
-    <pluginRepositories>
-        <pluginRepository>
-            <id>central</id>
-            <name>local private nexus</name>
-            <url>http://10.64.175.225:8081/nexus/content/groups/I2000V5MainRelease</url>
-            <releases><enabled>true</enabled></releases>
-            <snapshots><enabled>false</enabled></snapshots>
-        </pluginRepository>
-        <pluginRepository>
-            <id>central-snapshots</id>
-            <name>local private nexus</name>
-            <url>http://10.64.175.225:8081/nexus/content/groups/I2000V5MainSnapshot</url>
-            <releases><enabled>false</enabled></releases>
-            <snapshots><enabled>true</enabled></snapshots>
-        </pluginRepository>
-	</pluginRepositories>
 
 8. Maven离线安装插件：
 	mvn install:install-file -Dfile=<path-to-file> -DgroupId=<group-id> \
