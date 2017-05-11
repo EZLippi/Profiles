@@ -1,0 +1,35 @@
+        String keystoreFileName = "keystore.jks";
+        File sslFile = new File(file);
+
+        String keystoreType = KeyStore.getDefaultType();
+        KeyStore keyStore = KeyStore.getInstance(keystoreType);
+        FileInputStream stream = new FileInputStream(sslFile);
+        keyStore.load(stream, ssl_pwd);
+        stream.close();
+        // 创建并初始化证书库工厂
+        String alg = KeyManagerFactory.getDefaultAlgorithm();
+        KeyManagerFactory kmFact = KeyManagerFactory.getInstance(alg);
+        kmFact.init(keyStore, ssl_pwd);
+
+        KeyManager[] kms = kmFact.getKeyManagers();
+
+        // 创建并初始化 SSLContext 实例
+        SSLContext context = SSLContext.getInstance("SSL");
+        context.init(kms, null, new SecureRandom());
+        //使用jetty提供的SSLContextFactory做进一步安全设置
+        SslContextFactory sslContextFactory = new SslContextFactory(false);
+        sslContextFactory.setSslContext(context);
+        //只有TLSv1.2才是安全的
+        Properties sslProperties = new Properties();
+        //从文件中加载TLS版本和支持的加密套件
+        String[] protocols = sslProperties.getProperty("ssl.protocols", "TLSv1.2").split(",");
+        String[] algorithms = sslProperties.getProperty("ssl.ciphers").split(",");
+        sslContextFactory.setIncludeProtocols(protocols);
+        sslContextFactory.setIncludeCipherSuites(algorithms);
+        sslContextFactory.setAllowRenegotiate(true);
+        //不验证对端,不考虑trustStore
+        sslContextFactory.setNeedClientAuth(false);
+        sslContextFactory.start();
+        SSLServerSocketFactory sslServerSocketFactory = sslContextFactory.getSslContext().getServerSocketFactory();
+        
+        sslServerSocket = (SSLServerSocket) sslServerSocketFactory.createServerSocket(port);
