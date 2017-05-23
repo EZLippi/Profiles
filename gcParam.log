@@ -6,3 +6,5 @@
 -XX:+HeapDumpOnOutOfMemoryError
 -XX:CICompilerCount=2
 -Xloggc:gc.log -verbose:gc -XX:+PrintClassHistogram -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+PrintGCTimeStamps -XX:+PrintHeapAtGC -XX:+UseGCLogFileRotation -XX:NumberOfGCLogFiles=5 -XX:GCLogFileSize=5M
+PrintTenuringDistribution 打印GC年龄信息
+-XX:+PrintTLAB  打印线程局部分配区域信息
