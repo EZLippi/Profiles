@@ -1,0 +1,8 @@
+-Xms2g -Xmx6g -XX:MetaspaceSize=800m -XX:MaxMetaspaceSize=800m -XX:ReservedCodeCacheSize=128m
+-Xmn1g -XX:SurvivorRatio=6
+-XX:+UseConcMarkSweepGC -XX:+UseParNewGC 
+-XX:+ExplicitGCInvokesConcurrentAndUnloadsClasses这个参数和-XX:+UseConcMarkSweepGC配合使用，当NIO框架显式调用system.gc()时使用CMS GC
+-XX:+UseCMSInitiatingOccupancyOnly -XX:CMSInitiatingOccupancyFraction=75 -XX:ParallelGCThreads=6 设置CMS阈值及线程数
+-XX:+HeapDumpOnOutOfMemoryError
+-XX:CICompilerCount=2
+-Xloggc:gc.log -verbose:gc -XX:+PrintClassHistogram -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+PrintGCTimeStamps -XX:+PrintHeapAtGC -XX:+UseGCLogFileRotation -XX:NumberOfGCLogFiles=5 -XX:GCLogFileSize=5M
