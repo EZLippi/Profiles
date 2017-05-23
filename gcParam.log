@@ -8,3 +8,7 @@
 -Xloggc:gc.log -verbose:gc -XX:+PrintClassHistogram -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+PrintGCTimeStamps -XX:+PrintHeapAtGC -XX:+UseGCLogFileRotation -XX:NumberOfGCLogFiles=5 -XX:GCLogFileSize=5M
 PrintTenuringDistribution 打印GC年龄信息
 -XX:+PrintTLAB  打印线程局部分配区域信息
+-XX:AutoBoxCacheMax=20000 自动装箱默认缓存-128~127
+-XX:+AlwaysPreTouch 启动时访问并置零内存页面
+-Djava.security.egd=file:/dev/./urandom 原用于Tomcat显式使用SHA1PRNG算法时，初始因子从/dev/random读取导致堵塞。而使用此设置后，额外效果是默认的SecureRandom算法也变成SHA1了
+-XX:MaxTenuringThreshold=2  对象在Survivor区熬过多少次Young GC后晋升到年老代，JDK7里看起来默认是6，跑起来好像变成了15
