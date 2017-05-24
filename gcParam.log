@@ -12,3 +12,7 @@ PrintTenuringDistribution 打印GC年龄信息
 -XX:+AlwaysPreTouch 启动时访问并置零内存页面
 -Djava.security.egd=file:/dev/./urandom 原用于Tomcat显式使用SHA1PRNG算法时，初始因子从/dev/random读取导致堵塞。而使用此设置后，额外效果是默认的SecureRandom算法也变成SHA1了
 -XX:MaxTenuringThreshold=2  对象在Survivor区熬过多少次Young GC后晋升到年老代，JDK7里看起来默认是6，跑起来好像变成了15
+
+http://www.techpaste.com/2012/02/java-command-line-options-jvm-performance-improvement/
+http://hllvm.group.iteye.com/group/topic/27945
+http://calvin1978.blogcn.com/articles/jvmoption-2.html
