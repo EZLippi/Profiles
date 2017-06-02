@@ -16,3 +16,4 @@ PrintTenuringDistribution 打印GC年龄信息
 http://www.techpaste.com/2012/02/java-command-line-options-jvm-performance-improvement/
 http://hllvm.group.iteye.com/group/topic/27945
 http://calvin1978.blogcn.com/articles/jvmoption-2.html
+打印安全点信息-XX:+PrintSafepointStatistics -XX:PrintSafepointStatisticsCount=1
