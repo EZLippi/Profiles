@@ -18,4 +18,5 @@ http://hllvm.group.iteye.com/group/topic/27945
 http://calvin1978.blogcn.com/articles/jvmoption-2.html
 打印安全点信息 -XX:+PrintGCApplicationStoppedTime -XX:+PrintSafepointStatistics -XX:PrintSafepointStatisticsCount=1
 JIT编译: -XX:+PrintCompilation  -XX:ReservedCodeCacheSize= XX:+UseCodeCacheFlushing
+https://blogs.oracle.com/poonam/why-do-i-get-message-codecache-is-full-compiler-has-been-disabled
  
