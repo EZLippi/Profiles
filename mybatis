@@ -1,0 +1,103 @@
+## 一级缓存
+一级缓存是本地缓存，和BaseExecutor关联,BaseExecutor有三个实现类，SimpleExecutor、ReuseExecutor和BatchExecutor,
+SqlSession初始化时会创建Executor的实例，Mybatis默认使用的是SimpleExecutor,初始化代码如下所示:
+//Configuration.java
+public Executor newExecutor(Transaction transaction, ExecutorType executorType) {
+    executorType = executorType == null ? defaultExecutorType : executorType;
+    executorType = executorType == null ? ExecutorType.SIMPLE : executorType;
+    Executor executor;
+    if (ExecutorType.BATCH == executorType) {
+      executor = new BatchExecutor(this, transaction);
+    } else if (ExecutorType.REUSE == executorType) {
+      executor = new ReuseExecutor(this, transaction);
+    } else {
+      executor = new SimpleExecutor(this, transaction);
+    }
+    //如果启用二级缓存,用CachingExecutor装饰类
+    if (cacheEnabled) {
+      executor = new CachingExecutor(executor);
+    }
+    executor = (Executor) interceptorChain.pluginAll(executor);
+    return executor;
+  }
+BaseExecutor初始化时会初始化本地缓存，实现类为PerpetualCache，它的实现比较简单，里面就是一个HashMap来保存对象。
+
+public class PerpetualCache implements Cache {
+
+  private String id;
+
+  private Map<Object, Object> cache = new HashMap<Object, Object>();
+
+  public PerpetualCache(String id) {
+    this.id = id;
+  }
+一级缓存是SqlSession级别的缓存,在sqlSession提交时会清空本地缓存,因为commit操作一般对应插入、更新或者删除操作，清空缓存防止读取脏数据。
+//BaseExecutor.java
+public void commit(boolean required) throws SQLException {
+if (closed) {
+  throw new ExecutorException("Cannot commit, transaction is already closed");
+}
+clearLocalCache();
+flushStatements();
+if (required) {
+  transaction.commit();
+}
+}
+## 二级缓存  
+
+如果用户在全局配置文件SqlMapConfig.xml或者mapper文件里配置了"cacheEnabled=true"，
+如下所示:
+//SqlMapConfig.xml
+<configuration>
+  <settings>
+    <setting name="cacheEnabled" value="true"/>
+  </settings>
+</configuration>
+//UserMapper.xml
+<mapper namespace="com.ezlippi.mybatis.mapper.UserMapper">
+<!-- 开启本mapper namespace下的二级缓存 -->
+<cache
+  eviction="FIFO"//缓存过期策略,可以是LRU、FIFO、SOFT、WEAK
+  flushInterval="60000"//缓存刷新间隔,除了语句刷新外到了这个时间间隔强制刷新
+  size="512"
+  readOnly="true"/>
+</mapper>  
+MyBatis在为SqlSession对象创建Executor对象时，会给Executor对象加上一个装饰者：CachingExecutor，这时SqlSession使用CachingExecutor对象来完成操作请求。CachingExecutor对于查询请求，会先判断该查询请求在二级缓存中是否有缓存，如果有则直接返回缓存结果；如果没有再交给真正的Executor对象来完成查询操作，之后CachingExecutor会将真正Executor返回的查询结果放置到缓存中，然后再返回给用户。
+
+MyBatis的二级缓存是可以热插拔的，你可以用MyBatis自带的LRUCache、FIFOCache等，也可以用第三方的缓存库，比如Memcached或者EhCache,
+二级缓存的作用域比一级缓存更广，作用域为一个Mapper的namespace,namaspace相同则使用同一个二级缓存区域，比如一个UserMapper类里面有SelectOne()
+和selectList()两个查询操作，这两个操作共享同一个缓存区域。同一个Mapper的不同SqlSession可以共享一个二级缓存，如果任意一个sqlSession执行了commit()操作
+则清空该namespace对应的二级缓存。
+
+你还可以为每条Mapper语句设置是否要刷新缓存,可以指定select语句是否使用缓存,如下所示:
+<select ... flushCache="false" useCache="true"/>
+<insert ... flushCache="true"/>
+<update ... flushCache="true"/>
+<delete ... flushCache="true"/>
+
+这里需要注意的是:二级缓存需要查询结果映射的pojo对象实现Java.io.Serializable接口,如果存在父类、成员pojo都需要实现序列化接口。
+最后贴一下CachingExecutor的查询语句: 
+public <E> List<E> query(MappedStatement ms, Object parameterObject, RowBounds rowBounds, ResultHandler resultHandler, CacheKey key, BoundSql boundSql)
+  throws SQLException {
+//获取MapperStatement关联的Cache，和Mapper的Namespace相关联
+Cache cache = ms.getCache();
+if (cache != null) {
+   //获取Mapper语句的flushCache配置
+  flushCacheIfRequired(ms);
+  if (ms.isUseCache() && resultHandler == null) {
+    ensureNoOutParams(ms, parameterObject, boundSql);
+    //从TransactionalCacheManager获取缓存的对象
+    List<E> list = (List<E>) tcm.getObject(cache, key);
+    //如果缓存中没有找到则调用实际的Executor执行查询语句,然后再更新缓存
+    if (list == null) {
+      list = delegate.<E> query(ms, parameterObject, rowBounds, resultHandler, key, boundSql);
+      tcm.putObject(cache, key, list); // issue #578 and #116
+    }
+    return list;
+  }
+}
+return delegate.<E> query(ms, parameterObject, rowBounds, resultHandler, key, boundSql);
+}
+ 
+  
+  
