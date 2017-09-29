@@ -1,0 +1,188 @@
+# MyBatis多数据源配置
+
+常见的数据库连接池有C3P0、DBCP和阿里巴巴的druid,后两个在实际场景中用的比较多,这个案例简单介绍Spring+Druid+MyBatis
+实现多数据源配置,基本原理是继承自Spring提供的AbstractRoutingDataSource这个抽象类,把所有的DataSource放到Map里面,
+然后重写determineCurrentLookupKey()这个方法,Spring的AbstractRoutingDataSource在获取数据库连接时会先调用
+determineCurrentLookupKey()方法来找到数据库的key值,然后从Map中找到对应的DataSource获取数据库连接。
+
+<!--more-->
+
+## 数据源配置
+
+数据库连接池我用的阿里的druid,首先配置一个数据源的父类,定义一些公共的连接池参数,然后配置了两个继承自AbstractDataSource的
+读写datasource,配置如下所示:
+
+``` XML
+<!-- applicationContext.xml -->
+<!-- 数据源参数配置 -->
+<context:property-placeholder location="classpath:datasource.properties" />
+
+<bean id="abstractDataSource" abstract="true" class="com.alibaba.druid.pool.DruidDataSource" init-method="init"
+          destroy-method="close">
+        <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+        <!-- 基本属性 url、user、password -->
+        <!-- 配置初始化大小、最小、最大 -->
+        <property name="initialSize" value="10"/>
+        <property name="minIdle" value="10"/>
+        <property name="maxActive" value="10"/>
+        <!-- 配置获取连接等待超时的时间 -->
+        <property name="maxWait" value="6000"/>
+        <!-- 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 -->
+        <property name="timeBetweenEvictionRunsMillis" value="60000"/>
+        <!-- 配置一个连接在池中最小生存的时间，单位是毫秒 -->
+        <property name="minEvictableIdleTimeMillis" value="300000"/>
+        <property name="validationQuery" value="SELECT 1"/>
+        <property name="testWhileIdle" value="true"/>
+        <property name="testOnBorrow" value="false"/>
+        <property name="testOnReturn" value="false"/>
+        <!-- 打开PSCache，并且指定每个连接上PSCache的大小 -->
+        <property name="poolPreparedStatements" value="true"/>
+        <property name="maxPoolPreparedStatementPerConnectionSize" value="20"/>
+        <property name="filters" value="config"/>
+        <property name="connectionProperties" value="config.decrypt=false" />
+    </bean>
+
+    <bean id="DataSourceRead"  parent="abstractDataSource">
+        <property name="url" value="${read_url}"/>
+        <property name="username" value="${read_userName}"/>
+        <property name="password" value="${read_userValue}"/>
+    </bean>
+
+    <bean id="DataSourceWrite"  parent="abstractDataSource">
+        <property name="url" value="${write_url}"/>
+        <property name="username" value="${write_userName}"/>
+        <property name="password" value="${write_userValue}"/>
+    </bean>
+```
+
+然后实现一个类RWDataSource继承自AbstractRoutingDataSource,readDataSource和writeDataSource通过Spring注入,然后重写
+afterPropertiesSet()和determineCurrentLookupKey()这两个方法,关键代码如下,setter和getter方法我这里省略了。
+
+``` java
+public class RWDataSource extends AbstractRoutingDataSource {
+
+    private Object writeDataSource; //写数据源
+
+    private Object readDataSource; //读数据源
+
+    @Override
+    public void afterPropertiesSet() {
+        if (this.writeDataSource == null) {
+            throw new IllegalArgumentException("Property 'writeDataSource' is required");
+        }
+        setDefaultTargetDataSource(writeDataSource);
+        Map<Object, Object> targetDataSources = new HashMap<>();
+        targetDataSources.put(RWDataSourceType.WRITE.name(), writeDataSource);
+        if(readDataSource != null) {
+            targetDataSources.put(RWDataSourceType.READ.name(), readDataSource);
+        }
+        //调用父类的方法把数据源注入
+        setTargetDataSources(targetDataSources);
+        super.afterPropertiesSet();
+    }
+
+    @Override
+    protected Object determineCurrentLookupKey() {
+
+        RWDataSourceType dynamicDataSourceGlobal = RWDataSourceHolder.getDataSource();
+
+        if(dynamicDataSourceGlobal == null
+                || dynamicDataSourceGlobal == RWDataSourceType.WRITE) {
+            return RWDataSourceType.WRITE.name();
+        }
+
+        return RWDataSourceType.READ.name();
+    }
+```
+
+determineCurrentLookupKey()方法这里主要是从RWDataSourceHolder这个类里取出RWDataSourceType(枚举类,包含Read和Write),
+RWDataSourceHolder类里只有一个ThreadLocal的RWDataSourceType对象,用于保存每个线程选择的数据源,在使用Mybatis时要
+根据执行的SQL语句类型动态修改当前线程的RWDataSourceType。
+
+``` java
+public class RWDataSourceHolder {
+    private static final ThreadLocal<RWDataSourceType> holder = new ThreadLocal<RWDataSourceType>();
+
+    public static void putDataSource(RWDataSourceType dataSource){
+        holder.set(dataSource);
+    }
+
+    public static RWDataSourceType getDataSource(){
+        return holder.get();
+    }
+}
+```
+
+接下来就是重点了,怎么根据MyBatis要执行的语句类型来动态修改数据源类型呢,这里就要用到MyBatis提供的插件的能力,MyBatis
+里的数据库增删改查操作最后都是执行的Executor的query()或者update()方法,因此我们需要做的就是拦截Executor的query和update
+方法,根据执行的SQL语句类型来动态修改数据源的key值,插件的代码如下:
+
+## MyBatis拦截插件
+``` java
+@Intercepts({
+        @Signature(type = Executor.class, method = "update", args = {
+                MappedStatement.class, Object.class }),
+        @Signature(type = Executor.class, method = "query", args = {
+                MappedStatement.class, Object.class, RowBounds.class,
+                ResultHandler.class }) })
+public class RWDataSourceMybatisPlugin implements Interceptor {
+
+    private static final String REGEX = ".*insert\\u0020.*|.*delete\\u0020.*|.*update\\u0020.*";
+
+    private static final Map<String, RWDataSourceType> cacheMap = new ConcurrentHashMap<>();
+
+    @Override
+    public Object intercept(Invocation invocation) throws Throwable {
+
+        Object[] objects = invocation.getArgs();
+        MappedStatement ms = (MappedStatement) objects[0];
+
+        RWDataSourceType dataSourceType = null;
+
+        if((dataSourceType = cacheMap.get(ms.getId())) == null) {
+            //读方法
+            if(ms.getSqlCommandType().equals(SqlCommandType.SELECT)) {
+                //!selectKey 为自增id查询主键(SELECT LAST_INSERT_ID() )方法，使用主库
+                if(ms.getId().contains(SelectKeyGenerator.SELECT_KEY_SUFFIX)) {
+                    dataSourceType = RWDataSourceType.WRITE;
+                } else {
+                    BoundSql boundSql = ms.getSqlSource().getBoundSql(objects[1]);
+                    String sql = boundSql.getSql().toLowerCase().replaceAll("[\\t\\n\\r]", " ");
+                    if(sql.matches(REGEX)) {
+                        dataSourceType = RWDataSourceType.WRITE;
+                    } else {
+                        dataSourceType = RWDataSourceType.READ;
+                    }
+                }
+            }else{
+                dataSourceType = RWDataSourceType.WRITE;
+            }
+            cacheMap.put(ms.getId(), dataSourceType);
+        }
+        //修改当前线程要选择的数据源的key
+        RWDataSourceHolder.putDataSource(dataSourceType);
+
+        return invocation.proceed();
+    }
+
+    @Override
+    public Object plugin(Object target) {
+        if (target instanceof Executor) {
+            return Plugin.wrap(target, this);
+        } else {
+            return target;
+        }
+    }
+```
+
+
+最后在mybatis的配置文件里配置拦截插件就可以了,通过以上的步骤就实现了数据库读写分离的功能,有些步骤我省略了,有疑问的可以给我留言,
+晚一点我把附件上传上来。
+
+``` XML
+<!-- mybatis-config.xml -->
+<plugins>
+  <plugin interceptor="RWDataSourceMybatisPlugin">
+  </plugin>
+</plugins>
+```
