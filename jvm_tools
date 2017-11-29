@@ -1,2 +1,7 @@
 1.查看所有Java进程：jps
 2.导出Java Heap镜像: jmap -dump:format=b,file=[filename] [pid]
+3.查看GC情况: jstat -gcutil [pid] [间隔时间2s] [查看多少次]
+4.查看堆的使用状况信息 jmap -heap [pid] 
+5.查看堆中大对象:jmap -histo  [pid]| head -n 10
+查看线程堆栈: jstack [pid]
+查看jvm参数:jinfo [pid]
