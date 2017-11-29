@@ -1,0 +1,2 @@
+1.查看所有Java进程：jps
+2.导出Java Heap镜像: jmap -dump:format=b,file=[filename] [pid]
