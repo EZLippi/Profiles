@@ -5,3 +5,18 @@
 5.查看堆中大对象:jmap -histo  [pid]| head -n 10
 查看线程堆栈: jstack [pid]
 查看jvm参数:jinfo [pid]
+获取HeadDump其他方法:
+-XX:+HeapDumpOnOutOfMemoryError
+-XX:+HeapDumpOnCtrlBreak
+MAT命令:
+-Xms6144m
+-Xmx8192m
+-XX:+UseConcMarkSweepGC
+-XX:+UseParNewGC
+-XX:+CMSParallelRemarkEnabled
+-XX:+CMSClassUnloadingEnabled
+-XX:+UseCMSInitiatingOccupancyOnly
+
+./ParseHeapDump.sh /opt/heap_dump/jvm.hprof org.eclipse.mat.api:suspects
+./ParseHeapDump.sh /opt/heap_dump/jvm.hprof org.eclipse.mat.api:overview
+./ParseHeapDump.sh /opt/heap_dump/jvm.hprof org.eclipse.mat.api:top_components
