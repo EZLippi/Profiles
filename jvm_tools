@@ -20,3 +20,10 @@ MAT命令:
 ./ParseHeapDump.sh /opt/heap_dump/jvm.hprof org.eclipse.mat.api:suspects
 ./ParseHeapDump.sh /opt/heap_dump/jvm.hprof org.eclipse.mat.api:overview
 ./ParseHeapDump.sh /opt/heap_dump/jvm.hprof org.eclipse.mat.api:top_components
+
+如果环境上没有安装jdk,那把libattach.so和tools.jar单独抠出来放到lib目录：分别执行以下命令:
+java  -Djava.library.path=lib -classpath lib/tools.jar sun.tools.jstat.Jstat
+java  -Djava.library.path=lib -classpath lib/tools.jar sun.tools.jstack.JStack 
+java  -Djava.library.path=lib -classpath lib/tools.jar sun.tools.jmap.JMap
+java  -Djava.library.path=lib -classpath lib/tools.jar sun.tools.jps.Jps
+
