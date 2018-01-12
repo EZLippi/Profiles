@@ -1,0 +1,156 @@
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
+
+import java.io.File;
+import java.io.FileFilter;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+
+/**
+ * 提供Jar隔离的加载机制，会把传入的路径、及其子路径、以及路径中的jar文件加入到class path。
+ * 类加载的时候由JarLoader优先加载,加载失败再委托给父类加载器
+ * URLClassLoader的loadClass默认会委托给父类加载器加载,因此要重写loadClass()方法
+ */
+public class JarLoader extends URLClassLoader {
+    /**
+     * 保存所有在JarLoader路径上所有class全限定包名
+     */
+    private Set<String> classNamesToLoad;
+
+    public JarLoader(String[] paths) {
+        this(paths, JarLoader.class.getClassLoader());
+    }
+
+    public JarLoader(String[] paths, ClassLoader parent) {
+        super(getURLs(paths), parent);
+        URL[] jarUrls = getURLs(paths);
+        classNamesToLoad = getAllClassNameInJars(jarUrls);
+    }
+
+    @Override
+    public Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
+        //需要调用findLoaderClass()来检查该类是否已经加载过
+        if (findLoadedClass(name) != null) {
+            return findLoadedClass(name);
+        }
+        //是否优先加载
+        if (classNamesToLoad.contains(name)) {
+            return super.findClass(name);
+        } else {
+            return super.loadClass(name, resolve);
+        }
+    }
+
+    private Set<String> getAllClassNameInJars(URL[] jarUrls) {
+        if (jarUrls == null || jarUrls.length == 0) {
+            return Collections.emptySet();
+        }
+        Set<String> classNames = new HashSet<>();
+        for (URL url : jarUrls) {
+            ZipInputStream inputStream = null;
+            try {
+                inputStream = new ZipInputStream(new FileInputStream(url.getPath()));
+                ZipEntry entry;
+                while ((entry = inputStream.getNextEntry()) != null) {
+                    if ((entry.getName().endsWith(".class"))) {
+                        String className = entry.getName().replaceAll("/", "\\.");
+                        String myClass = className.substring(0, className.lastIndexOf('.'));
+                        classNames.add(myClass);
+                    }
+                }
+            } catch (IOException e) {
+//                e.printStackTrace();
+            } finally {
+                IOUtils.closeQuietly(inputStream);
+            }
+        }
+
+        return Collections.unmodifiableSet(classNames);
+    }
+
+
+    private static URL[] getURLs(String[] paths) {
+        if (paths == null || paths.length == 0) {
+            return new URL[0];
+        }
+
+        List<String> dirs = new ArrayList<String>();
+        for (String path : paths) {
+            dirs.add(path);
+            JarLoader.collectDirs(path, dirs);
+        }
+
+        List<URL> urls = new ArrayList<URL>();
+        for (String path : dirs) {
+            urls.addAll(doGetURLs(path));
+        }
+
+        return urls.toArray(new URL[urls.size()]);
+    }
+
+    private static void collectDirs(String path, List<String> collector) {
+        if (null == path || StringUtils.isBlank(path)) {
+            return;
+        }
+
+        File current = new File(path);
+        if (!current.exists() || !current.isDirectory()) {
+            return;
+        }
+
+        File[] files = current.listFiles();
+        if (files == null || files.length == 0) {
+            return;
+        }
+        for (File child : files) {
+            if (!child.isDirectory()) {
+                continue;
+            }
+
+            collector.add(child.getAbsolutePath());
+            collectDirs(child.getAbsolutePath(), collector);
+        }
+    }
+
+    private static List<URL> doGetURLs(final String path) {
+        if (StringUtils.isEmpty(path)) {
+            return Collections.emptyList();
+        }
+
+        File jarPath = new File(path);
+
+        if (!jarPath.exists() ||  !jarPath.isDirectory()) {
+            return Collections.emptyList();
+        }
+
+        /* set filter */
+        FileFilter jarFilter = new FileFilter() {
+            @Override
+            public boolean accept(File pathname) {
+                return pathname.getName().endsWith(".jar");
+            }
+        };
+
+        /* iterate all jar */
+        File[] allJars = new File(path).listFiles(jarFilter);
+        if (allJars == null) {
+            return Collections.emptyList();
+        }
+        List<URL> jarURLs = new ArrayList<URL>(allJars.length);
+
+        for (File allJar : allJars) {
+            try {
+                jarURLs.add(allJar.toURI().toURL());
+            } catch (Exception e) {
+                throw new IllegalStateException("get jars failed");
+            }
+        }
+
+        return jarURLs;
+    }
+}
