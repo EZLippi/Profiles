@@ -36,7 +36,7 @@
             <DefaultRolloverStrategy max="10"/>
         </RollingFile>
         <!--异步Appender,默认用ArrayBlockingQueue来缓存日志,不需要使用disruptor三方件-->
-        <Async name="ASYNC" includeLocation="true">
+        <Async name="ASYNC" bufferSize="262144" includeLocation="true">
             <AppenderRef ref="RollingFileInfo"/>
         </Async>
     </appenders>
