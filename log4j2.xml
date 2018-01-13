@@ -18,8 +18,8 @@
         </File>-->
 
         <!--这个会打印出所有的info及以下级别的信息，每次大小超过size，则这size大小的日志会自动存入按年份-月份建立的文件夹下面并进行压缩，作为存档-->
-        <RollingFile name="RollingFileInfo" fileName="${sys:user.home}logs/log4j.log"
-                     filePattern="${sys:user.home}/logs/${date:yyyy-MM}/log4j-%d{yyyy-MM-dd}-%i.log">
+        <RollingFile name="RollingFileInfo" fileName="${sys:user.home}/log4j.log"
+                     filePattern="${sys:user.home}/${date:yyyy-MM}/log4j-%d{yyyy-MM-dd}-%i.log">
             <!--控制台只输出level及以上级别的信息（onMatch），其他的直接拒绝（onMismatch）-->
             <Filters>
                 <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY"/>
@@ -27,23 +27,32 @@
             <!-- %d打印日期 %p打印日志级别 %t打印线程名称 %C全限定类路径 %L行号(效率较低) %m日志详情 %n换行-->
             <PatternLayout pattern="[%d{yyyy-MM-dd HH:mm:ss:SSS}] [%p] [%t] [%C %L] %m%n"/>
             <Policies>
+                <!--基于时间的滚动策略，interval属性用来指定多久滚动一次-->
                 <TimeBasedTriggeringPolicy/>
+                <!--基于指定文件大小的滚动策略，size属性用来定义每个日志文件的大小-->
                 <SizeBasedTriggeringPolicy size="20 MB"/>
             </Policies>
+            <!--指定同一个文件夹下最多有几个日志文件时开始删除最旧的，创建新的-->
             <DefaultRolloverStrategy max="10"/>
         </RollingFile>
-
-        <Async name="ASYNC">
+        <!--异步Appender,默认用ArrayBlockingQueue来缓存日志,不需要使用disruptor三方件-->
+        <Async name="ASYNC" includeLocation="true">
             <AppenderRef ref="RollingFileInfo"/>
         </Async>
     </appenders>
     <!--然后定义logger，只有定义了logger并引入的appender，appender才会生效-->
     <loggers>
+        <!--异步Logger,需要引入disruptor-3.3.4.jar,
+        如果要全部都开启异步日志,要设置系统属性
+        log4j2.contextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector
+        如果配置了log4j2.contextSelector系统属性,那在logger配置中不要使用asyncRoot和asyncLogger,否则会把异步和异步Logger混用,
+        就会导致有两个后台线程,参考:https://logging.apache.org/log4j/2.x/manual/async.html-->
         <!--过滤掉spring的一些无用的DEBUG信息-->
-        <logger name="org.springframework" level="INFO"></logger>
-        <root level="all">
-            <appender-ref ref="Console"/>
+        <!--<AsyncLogger name="org.springframework" level="info" includeLocation="true">
+            <AppenderRef ref="Console"/>
+         </AsyncLogger>-->
+        <Root level="info" includeLocation="true">
             <appender-ref ref="ASYNC"/>
-        </root>
+        </Root>
     </loggers>
 </configuration>
