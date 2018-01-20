@@ -4,7 +4,7 @@
 -XX:+ExplicitGCInvokesConcurrentAndUnloadsClasses这个参数和-XX:+UseConcMarkSweepGC配合使用，当NIO框架显式调用system.gc()时使用CMS GC
 -XX:+UseCMSInitiatingOccupancyOnly -XX:CMSInitiatingOccupancyFraction=75 -XX:ParallelGCThreads=6 设置CMS阈值及线程数
 -XX:+HeapDumpOnOutOfMemoryError
--XX:CICompilerCount=2
+-XX:CICompilerCount=2设置JIT编译线程数
 -Xloggc:gc.log -verbose:gc -XX:+PrintClassHistogram -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+PrintGCTimeStamps -XX:+PrintHeapAtGC -XX:+UseGCLogFileRotation -XX:NumberOfGCLogFiles=5 -XX:GCLogFileSize=5M
 PrintTenuringDistribution 打印GC年龄信息
 -XX:+PrintTLAB  打印线程局部分配区域信息
@@ -16,7 +16,13 @@ PrintTenuringDistribution 打印GC年龄信息
 http://www.techpaste.com/2012/02/java-command-line-options-jvm-performance-improvement/
 http://hllvm.group.iteye.com/group/topic/27945
 http://calvin1978.blogcn.com/articles/jvmoption-2.html
-打印安全点信息 -XX:+PrintGCApplicationStoppedTime -XX:+PrintSafepointStatistics -XX:PrintSafepointStatisticsCount=1
+
 JIT编译: -XX:+PrintCompilation  -XX:ReservedCodeCacheSize= XX:+UseCodeCacheFlushing
 https://blogs.oracle.com/poonam/why-do-i-get-message-codecache-is-full-compiler-has-been-disabled
+
+ -XX:+PerfDisableSharedMem
+ 
+ 打印安全点信息 -XX:+PrintGCApplicationStoppedTime 会在GC日志中输出应用停止时间,不仅仅是GC停顿时间
+ -XX:+PrintSafepointStatistics -XX:PrintSafepointStatisticsCount=1 会在stdout输出安全点统计信息
+ 
  
