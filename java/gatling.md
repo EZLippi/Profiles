@@ -13,7 +13,8 @@ Scala[官网](https://www.scala-lang.org/download/)下载scala SDK,打开Idea的
 
 执行Maven命令创建项目骨架:
 
- mvn archetype:generate -DinteractiveMode=false -DarchetypeGroupId=io.gatling.highcharts -DarchetypeArtifactId=gatling-highcharts-maven-archetype -DgroupId=com.ezlippi  -DartifactId=gatling.test  -Dversion=1.0
+	 mvn archetype:generate -DinteractiveMode=false -DarchetypeGroupId=io.gatling.highcharts -DarchetypeArtifactId=gatling-highcharts-maven-archetype -DgroupId=com.ezlippi  -DartifactId=gatling.test  -Dversion=1.0
+ 
  生成如下项目结构：在src/test/scala目录下新建一个继承Simulation类的测试类,在里面写测试方法:
  
  ``` scala
