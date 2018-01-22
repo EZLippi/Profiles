@@ -2,7 +2,7 @@
 
 Gatling 是一个功能强大的负载测试工具。它是为易用性、可维护性和高性能而设计的,它能生成丰富多彩的报告，包含测试案例中收集的所有指标,该功能似乎比 JMeter更好,因此我在实际压力测试中选用Gatling。
 
-###　gatling安装
+### Gatling安装
 
 从Gatling[官网](https://gatling.io/)下载后解压即可,执行bin目录下的gatling.bat或者gatling.sh即可运行,要先安装好jdk配置好环境变量
 
