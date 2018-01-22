@@ -50,16 +50,16 @@ Scala[官网](https://www.scala-lang.org/download/)下载scala SDK,打开Idea的
  disableCompiler执行的时候是否禁止编译,因为我写完测试类后就右键编译把scala文件编译好了，执行maven命令时没必要再次编译,插件配置如下:
  ``` XML
  <plugin>
-				<groupId>io.gatling</groupId>
-				<artifactId>gatling-maven-plugin</artifactId>
-				<version>2.2.4</version>
-				<configuration>
-					<!-- 测试脚本 -->
-					<simulationClass>com.ezlippi.OpenApiSimulation</simulationClass>
-					<!-- 结果输出地址 -->
-					<resultsFolder>gatling</resultsFolder>
-					<disableCompiler>true</disableCompiler>
-				</configuration>
+	<groupId>io.gatling</groupId>
+	<artifactId>gatling-maven-plugin</artifactId>
+	<version>2.2.4</version>
+	<configuration>
+		<!-- 测试脚本 -->
+		<simulationClass>com.ezlippi.OpenApiSimulation</simulationClass>
+		<!-- 结果输出地址 -->
+		<resultsFolder>gatling</resultsFolder>
+		<disableCompiler>true</disableCompiler>
+	</configuration>
 			</plugin>
  ```
  然后执行mvn gatling:execute就可以执行用例了,输出结果如下:
