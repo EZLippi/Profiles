@@ -41,7 +41,10 @@
     
 10. JMX相关:
     -Dcom.sun.management.jmxremote.port=${MY_JMX_PORT} -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=127.0.0.1   
+    
 11.  -XX:AutoBoxCacheMax=20000 增加了IntegerCache池的大小，吞吐量提高3%
+
+12. 如果在代码里某个特定位置被抛出过多次的话，HotSpot Server Compiler（C2）会透明的决定用fast throw来优化抛出异常的地方,异常message和stack trace都被清空，可以开启这个参数禁用这个优化:-XX:-OmitStackTraceInFastThrow。
  
 http://www.techpaste.com/2012/02/java-command-line-options-jvm-performance-improvement/
 http://hllvm.group.iteye.com/group/topic/27945
