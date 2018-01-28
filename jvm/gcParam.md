@@ -40,7 +40,8 @@
     -XX:+PerfDisableSharedMem
     
 10. JMX相关:
-    -Dcom.sun.management.jmxremote.port=${MY_JMX_PORT} -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=127.0.0.1    
+    -Dcom.sun.management.jmxremote.port=${MY_JMX_PORT} -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=127.0.0.1   
+11.  -XX:AutoBoxCacheMax=20000 增加了IntegerCache池的大小，吞吐量提高3%
  
 http://www.techpaste.com/2012/02/java-command-line-options-jvm-performance-improvement/
 http://hllvm.group.iteye.com/group/topic/27945
