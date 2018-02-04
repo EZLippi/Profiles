@@ -45,6 +45,11 @@
 11.  -XX:AutoBoxCacheMax=20000 增加了IntegerCache池的大小，吞吐量提高3%
 
 12. 如果在代码里某个特定位置被抛出过多次的话，HotSpot Server Compiler（C2）会透明的决定用fast throw来优化抛出异常的地方,异常message和stack trace都被清空，可以开启这个参数禁用这个优化:-XX:-OmitStackTraceInFastThrow。
+
+13. 如果出现频繁FullGC但又无法有效回收内存的场景，可能是新生代的有很多对象引用了老年代的对象，而CMS 的GC Root包括新生代的对象，因此在Remark之前进行一次Young GC可以有效减轻重新标记的压力,加上参数:-XX:+CMSScavengeBeforeRemark
+
+14. -XX:ParGCCardsPerStrideChunk=4096把每个线程扫描的Card数增加，减少线程在stride间切换的开销
+
  
 http://www.techpaste.com/2012/02/java-command-line-options-jvm-performance-improvement/
 http://hllvm.group.iteye.com/group/topic/27945
