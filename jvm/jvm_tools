@@ -27,3 +27,7 @@ java  -Djava.library.path=lib -classpath lib/tools.jar sun.tools.jstack.JStack
 java  -Djava.library.path=lib -classpath lib/tools.jar sun.tools.jmap.JMap
 java  -Djava.library.path=lib -classpath lib/tools.jar sun.tools.jps.Jps
 
+分析异常的fillInStackTrace方法是否开销大，perf top去看下us的开销，如果_ZN19java_lang_Throwable19fill_in_stack_traceE6HandleP6Thread这个排名很靠前，那就有必要看看异常的大头在哪里。
+
+最简单的用BTrace去跟一下Exception.<init>看构造Exception的栈是什么样的，然后排序汇总一下，一般就能看到什么Excetion最多，是谁抛的，然后有针对性地把它们去掉或者优化掉。
+
