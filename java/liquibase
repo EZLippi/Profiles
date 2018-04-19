@@ -1,0 +1,31 @@
+ <build>
+        <plugins>
+            <plugin>
+                <groupId>org.liquibase</groupId>
+                <artifactId>liquibase-maven-plugin</artifactId>
+                <version>3.4.2</version>
+                <configuration>
+                    <changeLogFile>src/main/resources/db.changelog.xml</changeLogFile>
+                    <outputChangeLogFile>src/main/resources/db.changelog.xml</outputChangeLogFile>
+                    <!-- mysql JDBC driver -->
+                    <driver>com.mysql.jdbc.Driver</driver>
+                    <!--<driver>oracle.jdbc.driver.OracleDriver</driver>-->
+                    <!-- mysql connect url -->
+                    <url>jdbc:mysql://{ip}:3306/test</url>
+                    <!--<url>jdbc:oracle:thin:@10{ip}:1536:testdb</url>-->
+                    <username>root</username>
+                    <password>Changeme_123</password>
+                    <clearCheckSums>true</clearCheckSums>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <!--<goal>generateChangeLog</goal>-->
+                            <goal>update</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
