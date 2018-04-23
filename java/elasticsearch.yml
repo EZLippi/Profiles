@@ -1,0 +1,44 @@
+# /etc/elasticsearch/elasticsearch.yml
+#
+# ElasticSearch配置
+#
+cluster.name: forNe
+
+# Node名称可以用来做路由
+node.name: ne-01
+node.datacenter: center
+
+# Force all memory to be locked, forcing the JVM to never swap
+bootstrap.mlockall: true
+
+##线程池设置 ##
+
+# 搜索池
+threadpool.search.type: fixed
+threadpool.search.size: 20
+threadpool.search.queue_size: 100
+
+# Bulk池
+threadpool.bulk.type: fixed
+threadpool.bulk.size: 60
+threadpool.bulk.queue_size: 300
+
+# 索引池
+threadpool.index.type: fixed
+threadpool.index.size: 20
+threadpool.index.queue_size: 100
+
+# Indices settings
+indices.memory.index_buffer_size: 20%
+indices.memory.min_shard_index_buffer_size: 12mb
+indices.memory.min_index_buffer_size: 96mb
+
+# Cache Sizes
+indices.fielddata.cache.size: 15%
+indices.fielddata.cache.expire: 6h
+indices.cache.filter.size: 15%
+indices.cache.filter.expire: 6h
+
+# Indexing Settings for Writes
+index.refresh_interval: 5s
+index.translog.flush_threshold_ops: 50000
