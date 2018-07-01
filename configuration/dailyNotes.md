@@ -22,3 +22,6 @@
 * 查询全部: curl 'localhost:9200/testdb/_search?pretty=true' -d '{"query":{"match_all":{}}}'
 * 根据Id查询: curl 'localhost:9200/testdb/_search?pretty=true' -d '{"query":{"match":{"id":e16"}}}'
 * 条件查询: curl 'http://localhost:9200/testdb_search?pretty=true' -d '{"query":{"match":{"type":"vm"}}}'
+7. SS
+202.5.20.48:2448
+103.29.70.110:2448
