@@ -1,0 +1,22 @@
+TimerTask和SchedualThreadPoolExecutor区别
+mysql锁加在什么位置
+ myisam和innodb的区别
+ 阐述事务的隔离级别和传播属性,mysql的默认隔离级别
+ 什么场景下会触发一次GC
+ OutofMemory的可能原因有哪些
+ Spring如何实现多数据源
+ 
+Integer a = new Integer(1), b = new Integer(1);
+      Integer c = 1, d = 1;
+      System.out.println(a==b);//false
+      System.out.println(c==d); //true
+http协议格式，get和post的区别
+
+class Transationc{
+a(){
+b();}
+@Trasaction
+b(){};
+}
+
+https握手机制
