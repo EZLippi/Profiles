@@ -1,14 +1,15 @@
 List、Set、Map是否都继承自Collection接口,MAP实现类，HashMap 1.7,1.8,ConcurrentHashMap
-JVM内存布局，object对象内存布局，一个空Object对象的占多大空间？
-TimerTask和SchedualThreadPoolExecutor区别
-mysql锁加在什么位置
- myisam和innodb的区别
+ArrayList和LinkedList区别
+JVM内存布局，为什么要分代收集,object对象内存布局，一个空Object对象的占多大空间？
+mysql锁加在什么位置,myisam和innodb的区别
+线程池参数，核心池的设置依据
+Lock和Synchronized区别，AQS,公平锁和非公平锁
  阐述事务的隔离级别和传播属性,mysql的默认隔离级别
  SQL注入的原理
- 什么场景下会触发一次GC
+ 线上jdk版本，用了哪些jvm参数，什么场景下会触发一次GC
  你怎么理解cookie和session，有哪些不同点
  OutofMemory的可能原因有哪些
- Spring如何实现多数据源
+ Spring如何实现多数据源，BeanFactory和FactoryBean,Spring事务
  Tomcat ClassLoader机制
  API和SPI区别
  列举3个以上的RuntimeException
