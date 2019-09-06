@@ -1,16 +1,22 @@
-List、Set、Map是否都继承自Collection接口,MAP实现类，HashMap 1.7,1.8,ConcurrentHashMap
+HashMap 1.7,1.8,ConcurrentHashMap
 ArrayList和LinkedList区别
 JVM内存布局，为什么要分代收集,object对象内存布局，一个空Object对象的占多大空间？
-mysql锁加在什么位置,myisam和innodb的区别
 线程池参数，核心池的设置依据
+Spring AOP是怎么实现的
+Spring如何实现多数据源，BeanFactory和FactoryBean,Spring事务
 Lock和Synchronized区别，AQS,公平锁和非公平锁
- 阐述事务的隔离级别和传播属性,mysql的默认隔离级别
- SQL注入的原理
- 线上jdk版本，用了哪些jvm参数，什么场景下会触发一次GC
- 你怎么理解cookie和session，有哪些不同点
- OutofMemory的可能原因有哪些
- Spring如何实现多数据源，BeanFactory和FactoryBean,Spring事务
+多线程通信有哪些方式
+常用的GC算法，哪些对象可以作为GC ROOT
+线程有哪些状态，以及是怎么转换的
+线上jdk版本，用了哪些jvm参数，什么场景下会触发一次GC
+ni耦合bio,JDK epoll的bug，netty是怎么解决的，怎么解决TCP粘报和拆包的问题
  Tomcat ClassLoader机制
+mysql锁加在什么位置,myisam和innodb的区别
+结合InnoDB的实现阐述事务的隔离级别,分别怎么解决脏读取，幻读和不可重复读
+对Mysql最新版本的同步机制有没有了解，比如一个主节点多个slave节点怎么保证可用性和性能
+如何实现分布式锁,redis实现方式中如果超时了还没执行完怎么办
+哪些场景会出现内存泄漏,HashMap，ThreadLocal,WeakHashMap,Finalze
+有个节点一直在Full GC，怎么快速定位并恢复环境
  API和SPI区别
  列举3个以上的RuntimeException
  <? extends T>和<? super T>
