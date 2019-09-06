@@ -3,7 +3,7 @@ ArrayList和LinkedList区别
 JVM内存布局，为什么要分代收集,object对象内存布局，一个空Object对象的占多大空间？
 线程池参数，核心池的设置依据
 Spring AOP是怎么实现的
-Spring如何实现多数据源，BeanFactory和FactoryBean,Spring事务
+谈谈你对IOC理解，Spring BeanFactory和FactoryBean,Spring事务
 Lock和Synchronized区别，AQS,公平锁和非公平锁
 多线程通信有哪些方式
 常用的GC算法，哪些对象可以作为GC ROOT
@@ -14,6 +14,7 @@ ni耦合bio,JDK epoll的bug，netty是怎么解决的，怎么解决TCP粘报和
 mysql锁加在什么位置,myisam和innodb的区别
 结合InnoDB的实现阐述事务的隔离级别,分别怎么解决脏读取，幻读和不可重复读
 对Mysql最新版本的同步机制有没有了解，比如一个主节点多个slave节点怎么保证可用性和性能
+mybatis如何实现多数据源读写分离
 如何实现分布式锁,redis实现方式中如果超时了还没执行完怎么办
 哪些场景会出现内存泄漏,HashMap，ThreadLocal,WeakHashMap,Finalze
 有个节点一直在Full GC，怎么快速定位并恢复环境
