@@ -2,6 +2,7 @@ HashMap 1.7,1.8,ConcurrentHashMap
 ArrayList和LinkedList区别
 JVM内存布局，为什么要分代收集,object对象内存布局，一个空Object对象的占多大空间？
 线程池参数，核心池的设置依据
+Object.finialize()方法原理
 Spring AOP是怎么实现的
 谈谈你对IOC理解，Spring BeanFactory和FactoryBean,Spring事务
 Lock和Synchronized区别，AQS,公平锁和非公平锁
