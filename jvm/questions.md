@@ -18,14 +18,18 @@
 ## Spring框架
 
 1. Spring AOP是怎么实现的，jdk动态代理和CGLib实现性能差别
-2. 谈谈你对IOC理解，Spring BeanFactory和FactoryBean
-3. Spring事务A调用B的问题
+2. spring框架有哪些模块
+3. 谈谈你对IOC理解，Spring BeanFactory和FactoryBean
+4. Spring事务A调用B的问题
+5. spring bean生命周期方法,initializingBean,@PostConstruct,init-method顺序
 
 ## Mysql
 
 1. mysql锁加在什么位置,myisam和innodb的区别
 2. 结合InnoDB的实现阐述事务的隔离级别,分别怎么解决脏读取，幻读和不可重复读
 3. 对Mysql最新版本的同步机制有没有了解，比如一个主节点多个slave节点怎么保证可用性和性能
+4. 如果发现mysql进程的CPU使用率500%，你要怎么处理(show processlist)
+5. 你们数据库是否支持emoji表情，如果不支持，如何操作？
 
 ## MyBatis
 
@@ -44,6 +48,8 @@
 
 1. 如何实现分布式锁,redis实现方式中如果超时了还没执行完怎么办
 2. Dubbo实现原理，服务发现机制
+3. 分布式ID生成
+4. 分布式事务实现方式
 
 ## 问题定位
 
