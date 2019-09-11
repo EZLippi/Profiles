@@ -14,6 +14,7 @@
 13. 哪些场景会出现内存泄漏,HashMap，ThreadLocal,WeakHashMap,Finalze
 14. Tomcat ClassLoader机制
 15. 泛型extends和super
+16. 调用System.gc()会立马进行垃圾回收吗
 
 ## Spring框架
 
