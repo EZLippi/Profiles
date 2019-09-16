@@ -24,6 +24,11 @@
 4. Spring事务A调用B的问题
 5. spring bean生命周期方法,initializingBean,@PostConstruct,init-method顺序
 
+## Netty
+ 1. bossGroup和workerGroup,NIOEventLoop线程池实现机制(一个线程一个队列)
+ 2. headContext和tailContext
+ 3. 
+
 ## Mysql
 
 1. mysql锁加在什么位置,myisam和innodb的区别
