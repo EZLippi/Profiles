@@ -12,9 +12,12 @@
 11. 常用的GC算法，哪些对象可以作为GC ROOT
 12. 线上jdk版本，用了哪些jvm参数，什么场景下会触发一次GC
 13. 哪些场景会出现内存泄漏,HashMap，ThreadLocal,WeakHashMap,Finalze
-14. Tomcat ClassLoader机制
+14. Tomcat ClassLoader机制, servlet-api 的scope为什么要设置为provided
 15. 泛型extends和super
 16. 调用System.gc()会立马进行垃圾回收吗
+17. HashSet 是如何保证没有重复元素的
+18. JUC包下面主要的类
+19. 使用 ThreadLocal 需要注意些什么
 
 ## Spring框架
 
@@ -23,6 +26,8 @@
 3. 谈谈你对IOC理解，Spring BeanFactory和FactoryBean
 4. Spring事务A调用B的问题
 5. spring bean生命周期方法,initializingBean,@PostConstruct,init-method顺序
+6. @Transactional注解不生效的场景
+7. springboot 的profile怎么管理
 
 ## Netty
  1. bossGroup和workerGroup,NIOEventLoop线程池实现机制(一个线程一个队列)
@@ -61,10 +66,15 @@
 
 1. 如何定位系统响应慢的问题
 2. 有个节点一直在Full GC，怎么快速定位并恢复环境
+3. 本地Tomcat部署时发现启动非常慢,怎么定位
 
 ## 协议栈
 
 1. http协议格式，get和post的区别
 2. https握手机制
 3. TCP backlog参数的作用
+
+## 工具
+
+1. git的分支怎么管理的
 
