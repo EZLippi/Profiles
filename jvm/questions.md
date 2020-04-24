@@ -18,6 +18,9 @@
 17. HashSet 是如何保证没有重复元素的
 18. JUC包下面主要的类
 19. 使用 ThreadLocal 需要注意些什么
+20. 哪些场景用到了spi机制
+21. 怎么中断一个线程
+
 
 ## Spring框架
 
@@ -28,6 +31,9 @@
 5. spring bean生命周期方法,initializingBean,@PostConstruct,init-method顺序
 6. @Transactional注解不生效的场景
 7. springboot 的profile怎么管理
+8. 执行某操作，前50次成功，第51次失败
+a 全部回滚(父类方法加事务PROPAGATION_REQUIRED )
+b 前50次提交第51次抛异常，ab场景分别如何设置Spring（传播性）(父类方法加事务PROPAGATION_REQUIRED ,子类方法加事务PROPAGATION_REQUIRES_NEW)
 
 ## Netty
  1. bossGroup和workerGroup,NIOEventLoop线程池实现机制(一个线程一个队列)
@@ -61,6 +67,9 @@
 2. Dubbo实现原理，服务发现机制
 3. 分布式ID生成
 4. 分布式事务实现方式
+6. zookeeper选举算法
+5. zookeeper对节点的watch监听通知是永久的吗
+
 
 ## 问题定位
 
@@ -78,3 +87,7 @@
 
 1. git的分支怎么管理的
 
+A B C
+A［］array ＝ new B［2］;
+A［0］＝ new C()
+用泛型优化
