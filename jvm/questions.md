@@ -45,16 +45,17 @@ b 前50次提交第51次抛异常，ab场景分别如何设置Spring（传播性
 
 ## Netty
 
- * bossGroup和workerGroup,NIOEventLoop线程池实现机制(一个线程一个队列)
+* bossGroup和workerGroup,NIOEventLoop线程池实现机制(一个线程一个队列)
 * headContext和tailContext 
 
 ## Mysql
 
-1. mysql锁加在什么位置,myisam和innodb的区别
-2. 结合InnoDB的实现阐述事务的隔离级别,分别怎么解决脏读取，幻读和不可重复读
-3. 对Mysql最新版本的同步机制有没有了解，比如一个主节点多个slave节点怎么保证可用性和性能
-4. 如果发现mysql进程的CPU使用率500%，你要怎么处理(show processlist)
-5. 你们数据库是否支持emoji表情，如果不支持，如何操作？
+* mysql锁加在什么位置,myisam和innodb的区别
+* 结合InnoDB的实现阐述事务的隔离级别,分别怎么解决脏读取，幻读和不可重复读
+* 对Mysql最新版本的同步机制有没有了解，比如一个主节点多个slave节点怎么保证可用性和性能
+* 如果发现mysql进程的CPU使用率500%，你要怎么处理(show processlist)
+* 你们数据库是否支持emoji表情，如果不支持，如何操作？
+* SQL优化的一般步骤是什么，怎么看执行计划，如何理解其中各个字段的含
 
 ## MyBatis
 
