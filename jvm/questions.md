@@ -1,15 +1,15 @@
 ## Java基础
 1. HashMap 1.7,1.8,ConcurrentHashMap size()方法实现，返回值是否准确
 2. ArrayList和LinkedList区别
-3. 线程池参数，核心池的设置依据
-4. Lock和Synchronized区别，AQS,公平锁和非公平锁
+3. 线程池参数，核心池的设置依据, 如果Runnable里抛出RuntimeException,线程还在吗
+4. Lock和Synchronized区别，AQS,公平锁和非公平锁, Synchronized 锁的升降级机制
 5. 线程有哪些状态，以及是怎么转换的
 6. Object.finialize()方法原理
 7. 列举3个以上的RuntimeException
 8. ni耦合bio,JDK epoll的bug，netty是怎么解决的，怎么解决TCP粘报和拆包的问题
 9. JVM内存布局，为什么要分代收集,object对象内存布局，一个空Object对象的占多大空间？
 10. 多线程通信有哪些方式
-11. 常用的GC算法，哪些对象可以作为GC ROOT
+11. 常用的GC算法，哪些对象可以作为GC ROOT, 有没有分析过GC日志里有很多小的停顿, 哪些场景会进入安全点
 12. 线上jdk版本，用了哪些jvm参数，什么场景下会触发一次GC
 13. 哪些场景会出现内存泄漏,HashMap，ThreadLocal,WeakHashMap,Finalze
 14. Tomcat ClassLoader机制, servlet-api 的scope为什么要设置为provided
