@@ -77,6 +77,7 @@ b 前50次提交第51次抛异常，ab场景分别如何设置Spring（传播性
 * 分布式ID生成
 * 分布式事务实现方式
 * zookeeper选举算法
+* zookeeper有哪几种watch, getData/exist/getChild
 * zookeeper对节点的watch监听通知是永久的吗
 
 
